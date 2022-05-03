@@ -35,7 +35,7 @@ def loadData(pData: list, pMax: int = 10000) -> list:
     # >
 
 
-def translateData(pData: list, x: tuple, y: tuple) -> list:
+def translateData(pData: list, x: tuple, y: tuple) -> tuple:
     '''  '''
 
     # local <
@@ -50,12 +50,12 @@ def translateData(pData: list, x: tuple, y: tuple) -> list:
 
     # >
 
-    # stack x <
+    # stack x and normalize <
     x = np.stack(x, axis = 0) / 255.0
 
     # >
 
-    return x, y
+    return (x, y)
 
 
 # main <
@@ -68,8 +68,8 @@ if (__name__ == '__main__'):
 
     # >
 
-    # get train and test batch <
-    # split test into test and validation batch <
+    # # get train and test batch <
+    # # split test into test and validation batch <
     xTrain, xTest, yTrain, yTest = train_test_split(
 
         x,
@@ -88,6 +88,11 @@ if (__name__ == '__main__'):
         random_state = 42
 
     )
+
+    # >
+
+    # <
+
 
     # >
 
