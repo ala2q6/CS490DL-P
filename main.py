@@ -3,6 +3,8 @@ import numpy as np
 from cv2 import imread
 import tensorflow as tf
 from os import listdir, path
+from tensorflow.keras import layers
+from tensorflow.keras import callbacks
 from tensorflow.keras import Sequential
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.utils import to_categorical
@@ -40,6 +42,7 @@ def translateData(pData: list, x: tuple, y: tuple) -> tuple:
     '''  '''
 
     # local <
+    inputShape = x[0].shape
     labelEncoder = LabelEncoder()
 
     # >
@@ -53,7 +56,7 @@ def translateData(pData: list, x: tuple, y: tuple) -> tuple:
 
     # >
 
-    return (x, y)
+    return (x, y, inputShape)
 
 
 # main <
@@ -62,7 +65,7 @@ if (__name__ == '__main__'):
     # load images from data directory <
     # one hot encode and categorize y, stack x <
     x, y = zip(*loadData(pKey = gData.keys(), pValue = gData.values()))
-    x, y = translateData(pData = gData, x = x, y = y)
+    x, y, inputShape = translateData(pData = gData, x = x, y = y)
 
     # >
 
@@ -87,8 +90,74 @@ if (__name__ == '__main__'):
 
     # >
 
-    # <
+    # initialize model <
+    model = Sequential()
 
+    model.add(layers.Conv2D(64, (3, 3), activation = 'relu', input_shape = inputShape))
+    model.add(layers.Dropout(0.2))
+
+    model.add(layers.Conv2D(64, (3, 3), activation = 'relu'))
+    model.add(layers.MaxPooling2D(2, 2))
+
+    model.add(layers.Conv2D(128, (3, 3), activation = 'relu'))
+    model.add(layers.Dropout(0.2))
+
+    model.add(layers.Conv2D(128, (3, 3), activation = 'relu'))
+    model.add(layers.MaxPooling2D(2, 2))
+
+    model.add(layers.Conv2D(256, (3, 3), activation = 'relu'))
+    model.add(layers.Dropout(0.2))
+
+    model.add(layers.Conv2D(256, (3, 3), activation = 'relu'))
+    model.add(layers.MaxPooling2D((2, 2), padding = 'same'))
+
+    model.add(layers.Flatten())
+    model.add(layers.Dropout(0.2))
+
+    model.add(layers.Dense(1024, activation = 'relu'))
+    model.add(layers.Dropout(0.2))
+
+    model.add(layers.Dense(512, activation = 'relu'))
+    model.add(layers.Dropout(0.2))
+
+    model.add(layers.Dense(2, activation = 'softmax'))
+
+    # >
+
+    # compile model <
+    model.compile(
+
+        metrics = ['accuracy'],
+        loss = 'categorical_crossentropy',
+        optimizer = tf.keras.optimizers.SGD(learning_rate=0.01)
+
+    )
+
+    # >
+
+    # set callbacks <
+    modelCallbacks = [
+
+        callbacks.ModelCheckpoint(filepath = '/tmp/checkpoint'),
+        callbacks.ReduceLROnPlateau(monitor = 'accuracy', patience = 3, factor = 0.2),
+        callbacks.EarlyStopping(monitor = 'accuracy', restore_best_weights = True, patience = 10)
+
+    ]
+
+    # >
+
+    # fit model <
+    history = model.fit(
+
+        xTrain,
+        yTrain,
+        epochs = 50,
+        shuffle = True,
+        batch_size = 64,
+        callbacks = modelCallbacks,
+        validation_data = (xValid, yValid)
+
+    )
 
     # >
 
