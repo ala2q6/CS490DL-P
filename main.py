@@ -3,6 +3,7 @@ import numpy as np
 from cv2 import imread
 import tensorflow as tf
 from os import listdir, path
+from tensorflow.keras import Sequential
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
@@ -80,9 +81,7 @@ if (__name__ == '__main__'):
 
         xTest,
         yTest,
-        shuffle = True,
-        test_size = 0.5,
-        random_state = 42
+        test_size = 0.5
 
     )
 
