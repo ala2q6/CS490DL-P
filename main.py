@@ -3,7 +3,6 @@ import numpy as np
 from cv2 import imread
 import tensorflow as tf
 from os import listdir, path
-
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
@@ -46,12 +45,9 @@ def translateData(pData: list, x: tuple, y: tuple) -> tuple:
 
     # one hot encode y <
     # categorize y <
+    # stack x then normalize <
     y = labelEncoder.fit_transform(y)
     y = to_categorical(y, len(pData))
-
-    # >
-
-    # stack x and normalize <
     x = np.stack(x, axis = 0) / 255.0
 
     # >
@@ -69,8 +65,8 @@ if (__name__ == '__main__'):
 
     # >
 
-    # # # get train and test batch <
-    # # # split test into test and validation batch <
+    # get train and test batch <
+    # split test into test and validation batch <
     xTrain, xTest, yTrain, yTest = train_test_split(
 
         x,
