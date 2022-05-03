@@ -4,6 +4,7 @@ from cv2 import imread
 import tensorflow as tf
 from os import listdir, path
 from tensorflow.keras import layers
+from matplotlib import pyplot as plt
 from tensorflow.keras import callbacks
 from tensorflow.keras import Sequential
 from sklearn.preprocessing import LabelEncoder
@@ -15,7 +16,7 @@ from sklearn.model_selection import train_test_split
 
 # global <
 gRealpath = path.realpath(__file__)
-gData = {'star' : 50, 'galaxy' : 50}
+gData = {'star' : 500, 'galaxy' : 500}
 gDirectory = ('/'.join(gRealpath.split('/')[:-1]))
 
 # >
@@ -59,6 +60,19 @@ def translateData(pData: list, x: tuple, y: tuple) -> tuple:
     return (x, y, inputShape)
 
 
+def graphHistory(pHistory: dict, pType: str) -> None:
+    '''  '''
+
+    plt.switch_backend('TkAgg')
+    plt.plot(pHistory[pType], label = 'Train')
+    plt.plot(pHistory[f"val_{pType}"], label = 'Validation')
+    plt.title(pType)
+    plt.ylabel(f"Decimal {pType}")
+    plt.xlabel('Epoch')
+    plt.legend()
+    plt.show()
+
+
 # main <
 if (__name__ == '__main__'):
 
@@ -84,7 +98,9 @@ if (__name__ == '__main__'):
 
         xTest,
         yTest,
-        test_size = 0.5
+        shuffle = True,
+        test_size = 0.5,
+        random_state = 42
 
     )
 
@@ -158,6 +174,13 @@ if (__name__ == '__main__'):
         validation_data = (xValid, yValid)
 
     )
+
+    # >
+
+    # graph accuracy <
+    # graph loss <
+    graphHistory(history.history, 'accuracy')
+    graphHistory(history.history, 'loss')
 
     # >
 
