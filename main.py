@@ -3,6 +3,7 @@ import numpy as np
 from cv2 import imread
 import tensorflow as tf
 from os import listdir, path
+
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
@@ -11,25 +12,25 @@ from sklearn.model_selection import train_test_split
 
 
 # global <
-gData = {0 : 'star', 1 : 'galaxy'}
 gRealpath = path.realpath(__file__)
+gData = {'star' : 50, 'galaxy' : 50}
 gDirectory = ('/'.join(gRealpath.split('/')[:-1]))
 
 # >
 
 
-def loadData(pData: list, pMax: int = 10000) -> list:
+def loadData(pKey: list, pValue: list) -> list:
     '''  '''
 
     # local <
-    rData, pData = [], [f'{gDirectory}/data/{i}' for i in pData]
-    f = lambda i : [rData.append((imread(f'{i}/{j}'), i.split('/')[-1])) for j in listdir(i)[:pMax]]
+    rData, pKey = [], [f'{gDirectory}/data/{i}' for i in pKey]
+    f = lambda k, v : [rData.append((imread(f'{k}/{i}'), k.split('/')[-1])) for i in listdir(k)[:v]]
 
     # >
 
     # get data <
     # return data <
-    [f(i) for i in pData]
+    [f(k, v) for k, v in zip(pKey, pValue)]
     return rData
 
     # >
@@ -63,13 +64,13 @@ if (__name__ == '__main__'):
 
     # load images from data directory <
     # one hot encode and categorize y, stack x <
-    x, y = zip(*loadData(pData = gData.values(), pMax = 5))
-    x, y = translateData(pData = gData.values(), x = x, y = y)
+    x, y = zip(*loadData(pKey = gData.keys(), pValue = gData.values()))
+    x, y = translateData(pData = gData, x = x, y = y)
 
     # >
 
-    # # get train and test batch <
-    # # split test into test and validation batch <
+    # # # get train and test batch <
+    # # # split test into test and validation batch <
     xTrain, xTest, yTrain, yTest = train_test_split(
 
         x,
