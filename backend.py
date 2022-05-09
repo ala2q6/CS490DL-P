@@ -55,9 +55,7 @@ def filterData(pFile: str, x: tuple, pProcessor: int = 4) -> None:
     '''  '''
 
     # local <
-    rInputShape = x[0].shape
-    labelEncoder = LabelEncoder()
-    lDir = f'{gDirectory}/data/bData'
+    lDir = f'{gDirectory}/data/{pFile}'
 
     # >
 
@@ -103,8 +101,8 @@ def translateData(pData: dict, x: tuple, y: tuple) -> tuple:
 
     # >
 
-    # one hot encode y <
-    # categorize y <
+    # convert data to integers <
+    # one-hot encode integers <
     # stack x then normalize <
     y = labelEncoder.fit_transform(y)
     y = to_categorical(y, len(pData))
@@ -145,7 +143,7 @@ def featureExtraction(model) -> None:
           continue
         print(i, layer.name, layer.output.shape)
 
-    # create model to ouptut right after the first hidden layer
+    # create model to output right after the first hidden layer
     ixs = [3, 6, 10]
     outputs = [model.layers[i].output for i in ixs]
     disModel = Model(inputs=model.inputs, outputs=outputs)
@@ -215,8 +213,6 @@ def buildModel(inputShape: tuple):
 
     # >
 
-    model.summary() # remove?
-
     # configure model  <
     model.compile(
 
@@ -253,9 +249,9 @@ def trainModel(x: tuple, y: tuple, model):
         rotation_range = 0.5,
         horizontal_flip = True,
         zoom_range = [0.5, 1.5],
-        # width_shift_range = 0.2,
+        width_shift_range = 0.2,
         height_shift_range = 0.2,
-        brightness_range = [.75, 1.5]
+        brightness_range = [0.75, 1.5]
 
     )
 
@@ -276,9 +272,9 @@ def trainModel(x: tuple, y: tuple, model):
     history = model.fit_generator(
 
         trainGen,
-        epochs = 25,
+        epochs = 25, # < insert 25
         shuffle = True,
-        steps_per_epoch = 50,
+        steps_per_epoch = 50, # < insert 50
         callbacks = modelCallbacks,
         validation_data = (x[2], y[2])
 
